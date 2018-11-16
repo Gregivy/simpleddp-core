@@ -5,6 +5,7 @@ import sinonChai from "sinon-chai";
 chai.use(sinonChai);
 
 import Socket from "../../src/socket";
+import EJSON from "ejson";
 
 class SocketConstructorMock {
     close () {}
@@ -32,7 +33,7 @@ describe("`Socket` class", () => {
             const object = {
                 a: "a"
             };
-            const expectedMessage = JSON.stringify(object);
+            const expectedMessage = EJSON.stringify(object);
             socket.send(object);
             expect(socket.rawSocket.send).to.have.been.calledWith(expectedMessage);
         });
@@ -175,19 +176,29 @@ describe("`Socket` class", () => {
 
         it("parses message data into an object", () => {
             const socket = new Socket(SocketConstructorMock);
-            sinon.stub(JSON, "parse");
+            sinon.stub(EJSON, "parse");
             socket.open();
             socket.rawSocket.onmessage({data: "message"});
-            expect(JSON.parse).to.have.been.calledWith("message");
-            JSON.parse.restore();
+            expect(EJSON.parse).to.have.been.calledWith("message");
+            EJSON.parse.restore();
         });
 
         it("ignores malformed messages", () => {
             const socket = new Socket(SocketConstructorMock);
-            sinon.stub(JSON, "parse").throws();
+            sinon.stub(EJSON, "parse").throws();
             socket.open();
             expect(socket.rawSocket.onmessage).not.to.throw();
-            JSON.parse.restore();
+            EJSON.parse.restore();
+        });
+
+        it("parses correctly EJSON-specific data types", function () {
+            var socket = new Socket(SocketConstructorMock);
+            var testDate = new Date();
+            sinon.stub(EJSON, "parse");
+            socket.open();
+            socket.rawSocket.onmessage({data: testDate});
+            expect(EJSON.parse).to.have.been.calledWith(testDate);
+            EJSON.parse.restore();
         });
 
         it("emits `message:in` events", () => {
@@ -195,7 +206,7 @@ describe("`Socket` class", () => {
             const handler = sinon.spy();
             socket.on("message:in", handler);
             socket.open();
-            socket.rawSocket.onmessage({data: JSON.stringify({a: "a"})});
+            socket.rawSocket.onmessage({data: EJSON.stringify({a: "a"})});
             expect(handler).to.have.callCount(1);
             expect(handler).to.have.been.calledWith({a: "a"});
         });

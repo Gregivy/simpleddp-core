@@ -1,6 +1,6 @@
 {
   "name": "simpleddp-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ddp javascript client",
   "main": "lib/ddp.js",
   "scripts": {
@@ -50,6 +50,7 @@
     "sinon-chai": "^2.14.0"
   },
   "dependencies": {
+    "ejson": "^2.1.2",
     "wolfy87-eventemitter": "^5.2.3"
   }
 }

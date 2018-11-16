@@ -26,6 +26,12 @@ export default class DDP extends EventEmitter {
 
         this.status = "disconnected";
 
+        //DDP session id
+        this.sessionId = null;
+
+        //clean queue on discconnect or not, default to false
+        this.cleanQueue = (options.cleanQueue === true);
+
         // Default `autoConnect` and `autoReconnect` to true
         this.autoConnect = (options.autoConnect !== false);
         this.autoReconnect = (options.autoReconnect !== false);
@@ -45,16 +51,18 @@ export default class DDP extends EventEmitter {
         this.socket.on("open", () => {
             // When the socket opens, send the `connect` message
             // to establish the DDP connection
-            this.socket.send({
+            let params = {
                 msg: "connect",
                 version: DDP_VERSION,
                 support: [DDP_VERSION]
-            });
+            };
+            if (this.sessionId) params.session = this.sessionId;
+            this.socket.send(params);
         });
 
         this.socket.on("close", () => {
             this.status = "disconnected";
-            this.messageQueue.empty();
+            if (this.cleanQueue) this.messageQueue.empty();
             this.emit("disconnected");
             if (this.autoReconnect) {
                 // Schedule a reconnection
@@ -68,8 +76,9 @@ export default class DDP extends EventEmitter {
         this.socket.on("message:in", message => {
             if (message.msg === "connected") {
                 this.status = "connected";
+                this.sessionId = message.session ? message.session : null;
                 this.messageQueue.process();
-                this.emit("connected");
+                this.emit("connected", message);
             } else if (message.msg === "ping") {
                 // Reply with a `pong` message to prevent the server from
                 // closing the connection
@@ -96,6 +105,7 @@ export default class DDP extends EventEmitter {
         *   `autoReconnect` flag to false.
         */
         this.autoReconnect = false;
+        this.sessionId = null;
         this.socket.close();
     }
 

@@ -89,6 +89,9 @@ establish a connection with the DDP server and will try to maintain it open.
 
 Available options are:
 
+- `cleanQueue` **boolean** *optional* [default: `false`]: whether to clean ddp message
+  queue on disconnect or not.
+
 - `endpoint` **string** *required*: the location of the websocket server. Its
   format depends on the type of socket you are using.
 

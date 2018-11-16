@@ -1,4 +1,5 @@
 import EventEmitter from "wolfy87-eventemitter";
+import EJSON from "ejson";
 
 export default class Socket extends EventEmitter {
 
@@ -10,10 +11,10 @@ export default class Socket extends EventEmitter {
     }
 
     send (object) {
-        const message = JSON.stringify(object);
+        const message = EJSON.stringify(object);
         this.rawSocket.send(message);
         // Emit a copy of the object, as the listener might mutate it.
-        this.emit("message:out", JSON.parse(message));
+        this.emit("message:out", EJSON.parse(message));
     }
 
     open () {
@@ -68,12 +69,12 @@ export default class Socket extends EventEmitter {
         this.rawSocket.onmessage = message => {
             var object;
             try {
-                object = JSON.parse(message.data);
+                object = EJSON.parse(message.data);
             } catch (ignore) {
                 // Simply ignore the malformed message and return
                 return;
             }
-            // Outside the try-catch block as it must only catch JSON parsing
+            // Outside the try-catch block as it must only catch EJSON parsing
             // errors, not errors that may occur inside a "message:in" event
             // handler
             this.emit("message:in", object);
