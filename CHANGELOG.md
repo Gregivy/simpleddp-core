@@ -1,4 +1,8 @@
-#1.0.1
+# 1.0.2
+
+* Replaced id checking inside sub method
+
+# 1.0.1
 
 * Added EJSON support
 * Added message object to connect emit

@@ -1,6 +1,6 @@
 {
   "name": "simpleddp-core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ddp javascript client",
   "main": "lib/ddp.js",
   "scripts": {

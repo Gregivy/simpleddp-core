@@ -120,8 +120,7 @@ export default class DDP extends EventEmitter {
         return id;
     }
 
-    sub (name, params, id = null) {
-        id || (id = uniqueId());
+    sub (name, params, id = uniqueId()) {
         this.messageQueue.push({
             msg: "sub",
             id: id,
