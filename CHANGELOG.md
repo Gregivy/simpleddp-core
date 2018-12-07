@@ -1,3 +1,7 @@
+# 1.0.3
+
+* Updated `wolfy87-eventemitter` to 5.2.5
+
 # 1.0.2
 
 * Replaced id checking inside sub method
