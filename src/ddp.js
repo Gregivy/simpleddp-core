@@ -29,12 +29,13 @@ export default class DDP extends EventEmitter {
         //DDP session id
         this.sessionId = null;
 
-        //clean queue on discconnect or not, default to false
+        //clean queue on disconnect or not, default to false
         this.cleanQueue = (options.cleanQueue === true);
 
         // Default `autoConnect` and `autoReconnect` to true
         this.autoConnect = (options.autoConnect !== false);
         this.autoReconnect = (options.autoReconnect !== false);
+        this.autoReconnectUserValue = this.autoReconnect;
         this.reconnectInterval = options.reconnectInterval || DEFAULT_RECONNECT_INTERVAL;
 
         this.messageQueue = new Queue(message => {
@@ -95,6 +96,7 @@ export default class DDP extends EventEmitter {
     }
 
     connect () {
+        this.autoReconnect = this.autoReconnectUserValue;
         this.socket.open();
     }
 
@@ -103,15 +105,25 @@ export default class DDP extends EventEmitter {
         *   If `disconnect` is called, the caller likely doesn't want the
         *   the instance to try to auto-reconnect. Therefore we set the
         *   `autoReconnect` flag to false.
+        *   Also we should remember autoReconnect value to restore it on connect.
         */
+        this.autoReconnectUserValue = this.autoReconnect;
         this.autoReconnect = false;
         this.sessionId = null;
         this.socket.close();
     }
 
-    method (name, params) {
+    pauseQueue() {
+      this.messageQueue.pause();
+    }
+
+    continueQueue() {
+      this.messageQueue.continue();
+    }
+
+    method (name, params, atBeginning = false) {
         const id = uniqueId();
-        this.messageQueue.push({
+        this.messageQueue[atBeginning?'unshift':'push']({
             msg: "method",
             id: id,
             method: name,

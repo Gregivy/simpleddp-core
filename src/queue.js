@@ -9,7 +9,17 @@ export default class Queue {
 
     constructor (consumer) {
         this.consumer = consumer;
+        this.paused = false;
         this.queue = [];
+    }
+
+    pause () {
+      this.paused = true;
+    }
+
+    continue () {
+      this.paused = false;
+      this.process();
     }
 
     push (element) {
@@ -17,12 +27,17 @@ export default class Queue {
         this.process();
     }
 
-    process () {
+    unshift (element) {
+        this.queue.unshift(element);
+        this.process();
+    }
+
+    process (opts) {
         if (this.queue.length !== 0) {
             const ack = this.consumer(this.queue[0]);
             if (ack) {
                 this.queue.shift();
-                this.process();
+                if (!this.paused) this.process();
             }
         }
     }
