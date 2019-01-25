@@ -62,9 +62,10 @@ export default class DDP extends EventEmitter {
         });
 
         this.socket.on("close", () => {
+            let oldStatus = this.status;
             this.status = "disconnected";
             if (this.cleanQueue) this.messageQueue.empty();
-            this.emit("disconnected");
+            if (oldStatus != "disconnected") this.emit("disconnected");
             if (this.autoReconnect) {
                 // Schedule a reconnection
                 setTimeout(

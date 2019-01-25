@@ -230,8 +230,9 @@ describe("`DDP` class", () => {
             global.setTimeout.restore();
         });
 
-        it("emits the `disconnected` event", () => {
+        it("emits the `disconnected` event if was 'connected'", () => {
             const ddp = new DDP(options);
+            ddp.status = "connected";
             ddp.emit = sinon.spy();
             ddp.socket.emit("close");
             expect(ddp.emit).to.have.been.calledWith("disconnected");

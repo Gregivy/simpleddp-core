@@ -1,3 +1,7 @@
+# 1.0.5
+
+* Now disconnect event won't fire on failed reconnecting events.
+
 # 1.0.4
 
 * Now method calls can be put at the beginning of the call queue.
