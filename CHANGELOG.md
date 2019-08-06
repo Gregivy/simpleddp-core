@@ -1,3 +1,7 @@
+# 1.0.6
+
+* Pausing message queue prevents holds every out-coming message.
+
 # 1.0.5
 
 * Now disconnect event won't fire on failed reconnecting events.

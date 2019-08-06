@@ -33,7 +33,7 @@ export default class Queue {
     }
 
     process (opts) {
-        if (this.queue.length !== 0) {
+        if (!this.paused && this.queue.length !== 0) {
             const ack = this.consumer(this.queue[0]);
             if (ack) {
                 this.queue.shift();
